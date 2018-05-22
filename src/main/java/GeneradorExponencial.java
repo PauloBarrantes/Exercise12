@@ -14,7 +14,7 @@ public class GeneradorExponencial {
     public double generate(){
 
         double numRandom = rnd.nextDouble();
-        double time = (-1/lambda)*Math.log(1-numRandom);
+        double time = (-1/media)*Math.log(1-numRandom);
         return time;
     }
 }

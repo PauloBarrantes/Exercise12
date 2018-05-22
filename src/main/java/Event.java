@@ -7,10 +7,12 @@
 // 1 - Llegada en Puntarenas un auto pesado
 // 2 - Llegada en Playa Naranjo un auto liviano
 // 3 - Llegada en Playa Naranjo un auto pesado
-// 4 - Viaje del ferry
+// 4 - Viaje del ferry de Puntarenas a Playa Naranjo
+// 5 - Viaje del ferry de Playa Naranjo a Puntarenas
 public class Event {
     private final double time;
     private final int type;
+
     /**
      Event Constructor
      @param time
