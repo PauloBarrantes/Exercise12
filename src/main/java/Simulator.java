@@ -34,8 +34,10 @@ class Simulator {
     private GeneradorNormal generadorNormal = new GeneradorNormal(6,1);
     private GeneradorExponencial generadorExponencial = new GeneradorExponencial(10);
     private GeneradorFuncionX generadorFuncionX = new GeneradorFuncionX();
-
-
+    private ArrayList<Carro> listaCarrosPuntarenas = new ArrayList<Carro>(200);
+    private ArrayList<Carro> listaCarrosPlayaNaranjo= new ArrayList<Carro>(200);
+    int indiceP;
+    int indicePN;
     /**Class constructor.
 
      */
@@ -49,6 +51,8 @@ class Simulator {
         this.tiempoPromedioColaP =0;
         this.tiempoPromedioColaPN = 0;
         this.tiempoPromedioSistema = 0;
+        this.indiceP = 0;
+        this.indicePN =0;
     }
 
     void simulate(){
@@ -70,6 +74,7 @@ class Simulator {
                 }else{
                     promedioDinero +=2000;
                 }
+                listaCarrosPuntarenas.add(indicePN, new Carro(clock));
                 procesarLlegadaP();
             }else{
                 if(actualEvent.getType() <= 3){
@@ -78,6 +83,7 @@ class Simulator {
                     }else{
                         promedioDinero +=2000;
                     }
+                    listaCarrosPlayaNaranjo.add(indicePN, new Carro(clock));
                     procesarLlegadaPN();
                 }else{
                     if(actualEvent.getType()== 4){
@@ -89,11 +95,9 @@ class Simulator {
             }
 
             System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo);
-            System.out.println("Tiempo que lleva esperando el ferry   " + tiempoEsperaFerry);
-            System.out.println("Dinero Promedio Generado  " + promedioDinero);
-            System.out.println("Tiempo Promedio En la Cola Puntarenas  " + 0);
-            System.out.println("Tiempo Promedio En la Cola Playa Naranjo  " + 0);
-            System.out.println("Tiempo Promedio En El Sistema  " + 1);
+            //System.out.println("Tiempo que lleva esperando el ferry   " + tiempoEsperaFerry);
+
+           // System.out.println("Tiempo Promedio En El Sistema  " + 1);
 
 
 
@@ -102,6 +106,10 @@ class Simulator {
             clock = tableOfEvents.peek().getTime();
 
         }
+        System.out.println("Dinero Promedio Generado  " + promedioDinero);
+
+        System.out.println("Tiempo Promedio En la Cola Puntarenas  " + calcularTiempoEsperaP());
+        System.out.println("Tiempo Promedio En la Cola Playa Naranjo  " + calcularTiempoEsperaPN());
 
     }
     private void procesarLlegadaP(){
@@ -113,8 +121,16 @@ class Simulator {
 
             if(queueLengthPuntarenas>=39) {
                 queueLengthPuntarenas -= 39;
+                for(int i = indiceP; i < indiceP+40;++i){
+                    listaCarrosPuntarenas.get(i).setHoraMontadaFerry(clock);
+                }
+                indiceP+=40;
             }else{
-                    queueLengthPuntarenas -= queueLengthPuntarenas;
+                for(int i = indiceP; i < indiceP+queueLengthPuntarenas;++i){
+                    listaCarrosPuntarenas.get(i).setHoraMontadaFerry(clock);
+                }
+                indiceP+=queueLengthPuntarenas;
+                queueLengthPuntarenas -= queueLengthPuntarenas;
             }
         }else{
             queueLengthPuntarenas++;
@@ -132,7 +148,15 @@ class Simulator {
             estadoFerry = 1;
             if(queueLengthPlayaNaranjo >= 39){
                 queueLengthPlayaNaranjo -= 39;
+                for(int i = indicePN; i < indicePN+40;++i){
+                    listaCarrosPlayaNaranjo.get(i).setHoraMontadaFerry(clock);
+                }
+                indicePN+=40;
             }else{
+                for(int i = indicePN; i < indicePN+queueLengthPlayaNaranjo;++i){
+                    listaCarrosPlayaNaranjo.get(i).setHoraMontadaFerry(clock);
+                }
+                indicePN+=queueLengthPlayaNaranjo;
                 queueLengthPlayaNaranjo -= queueLengthPlayaNaranjo;
             }
         }else{
@@ -143,9 +167,12 @@ class Simulator {
 
     private void procesarViajesP(){ //Procesan los viajes que fueron de Puntarenas a Playa Naranjo
         System.out.println("Proceso Viaje de Puntarenas a Playa Naranjo");
-
+        for(int i = indiceP-40; i < indiceP; ++i){
+            listaCarrosPuntarenas.get(i).setHoraSalida(clock);
+        }
         tiempoEsperaFerry = 0;
         estadoFerry = 2;
+
         if(queueLengthPlayaNaranjo >= 40){
             queueLengthPlayaNaranjo-=40;
             generarViaje(5);
@@ -155,7 +182,9 @@ class Simulator {
     }
     private void procesarViajesPN(){ //Procesan los viajes que fueron de Playa Naranjo a Puntarenas
         System.out.println(" Proceso Viaje de Pn a P");
-
+        for(int i = indicePN-40; i < indicePN; ++i){
+            listaCarrosPlayaNaranjo.get(i).setHoraSalida(clock);
+        }
         tiempoEsperaFerry = 0;
         estadoFerry = 0;
         if(queueLengthPuntarenas >= 40){
@@ -202,6 +231,22 @@ class Simulator {
         tableOfEvents.add(event);
     }
 
+    private double calcularTiempoEsperaP(){
+        double tiempoPromedio =0.0;
+        for(int i =0; i < indiceP;++i){
+            tiempoPromedio+= listaCarrosPuntarenas.get(i).getHoraMontadaFerry() - listaCarrosPuntarenas.get(i).getHoraLlegada();
+        }
+        return tiempoPromedio/indiceP;
+    }
+
+    private double calcularTiempoEsperaPN(){
+        double tiempoPromedio =0.0;
+        for(int i =0; i < indicePN;++i){
+            tiempoPromedio+= listaCarrosPlayaNaranjo.get(i).getHoraMontadaFerry() - listaCarrosPlayaNaranjo.get(i).getHoraLlegada();
+        }
+        return tiempoPromedio/indicePN;
+    }
+
     private void generarViaje(int type){
         Event event;
         Double time = generadorFuncionX.generate();
@@ -214,4 +259,34 @@ class Simulator {
 
 
 
+}
+
+class Carro {
+    private final double horaLlegada;
+    private double horaMontadaFerry;
+    private double horaSalida;
+
+    Carro(double horaLlegada){
+        this.horaLlegada = horaLlegada;
+    }
+
+    public double getHoraLlegada() {
+        return horaLlegada;
+    }
+
+    public double getHoraMontadaFerry() {
+        return horaMontadaFerry;
+    }
+
+    public void setHoraMontadaFerry(double horaMontadaFerry) {
+        this.horaMontadaFerry = horaMontadaFerry;
+    }
+
+    public double getHoraSalida() {
+        return horaSalida;
+    }
+
+    public void setHoraSalida(double horaSalida) {
+        this.horaSalida = horaSalida;
+    }
 }
