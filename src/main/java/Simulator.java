@@ -87,14 +87,35 @@ class Simulator {
                     procesarLlegadaPN();
                 }else{
                     if(actualEvent.getType()== 4){
-                        procesarViajesP();
-                    }else{
                         procesarViajesPN();
+                    }else{
+                        procesarViajesP();
                     }
                 }
             }
+            if(actualEvent.getType() <4){
+                if(actualEvent.getType() <= 1){
+                    if(actualEvent.getType() == 0){
+                        System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo + " Lugar: Puntarenas " + "Carro: Liviano" ) ;
 
-            System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo);
+                    }else{
+                        System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo + " Lugar: Puntarenas " + "Carro: Pesado" ) ;
+
+                    }
+                }else{
+                    if(actualEvent.getType() == 2){
+                        System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo + " Lugar: Playa Naranjo " + "Carro: Liviano" ) ;
+
+                    }else{
+                        System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo + " Lugar: Playa Naranjo " + "Carro: Pesado" ) ;
+
+                    }
+                }
+
+            }else{
+                System.out.println("Clock: " + clock +" "+ "QLP: " + queueLengthPuntarenas+" " + "QLPN: " + queueLengthPlayaNaranjo);
+            }
+
             //System.out.println("Tiempo que lleva esperando el ferry   " + tiempoEsperaFerry);
 
            // System.out.println("Tiempo Promedio En El Sistema  " + 1);
@@ -116,7 +137,7 @@ class Simulator {
         System.out.println("Proceso Llegada a Puntarenas");
         if ((queueLengthPuntarenas >= 39|| tiempoEsperaFerry >=240) && estadoFerry ==0 ){
             tiempoEsperaFerry = 0;
-            generarViaje(4);
+            generarViaje(5);
             estadoFerry = 1;
 
             if(queueLengthPuntarenas>=39) {
@@ -144,7 +165,7 @@ class Simulator {
 
         if ((queueLengthPlayaNaranjo >= 39 || tiempoEsperaFerry >=240) && estadoFerry ==2 ){
             tiempoEsperaFerry = 0;
-            generarViaje(5);
+            generarViaje(4);
             estadoFerry = 1;
             if(queueLengthPlayaNaranjo >= 39){
                 queueLengthPlayaNaranjo -= 39;
